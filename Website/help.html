@@ -1,0 +1,231 @@
+<html lang="en">
+	<head>
+		<title>Help</title>
+		<meta charset="utf-8"/>
+		<link href='http://fonts.googleapis.com/css?family=Kurale' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="style.css" type="text/css"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	</head>
+	<body onload="init()">
+
+		<header class="mainheader">
+			<nav><ul>
+				<li><a href="index.html">Home</a></li>
+				<li><a href="projects.html">Projects</a></li>
+				<li><a href="yourRPIDAY.php">Your RPIDAY</a></li>
+				<li class="active"><a href="help.html">Help</a></li>
+				<div class="log_sign" id="login">
+					<li class="signup"><a href="signup.html">Sign Up</a></li>
+					<li class="login"><a href="login.html">Log In</a></li>
+				</div>
+				<div class="loggedin" id="loggedin">
+					<h5 id="user_name"  onclick="toggleMenuOn();" class="loggedInH5"></h5>
+					<ul class="dropDownUser" id="dropDownUser">
+						<li><a href="#" id="profile">Profile</a></li>
+						<li><a href="messages.php" id="messages">Messages (3)</a></li>
+						<li><a href="log_out.php">Log Out</a></li>
+					</ul>
+				</div>
+			</ul></nav>
+		</header>
+		
+		<script>
+			
+			var contextMenuLinkClassName = "loggedInH5";
+						
+			function clickInsideElement( e, className ) {
+				var el = e.srcElement || e.target;
+
+				if ( el.classList.contains(className) ) {
+					return el;
+				} else {
+				while ( el = el.parentNode ) {
+					if ( el.classList && el.classList.contains(className) ) {
+						return el;
+					}
+				}
+			}
+
+			return false;
+			}
+			
+			var menuState = 0;
+			
+			function toggleMenuOff() {
+				document.getElementById('dropDownUser').style.display = 'none';
+				console.log("Menu Off");
+				menuState = 0;
+			}
+			
+			function toggleMenuOn() {
+				if(menuState == 0){
+					document.getElementById('dropDownUser').style.display = 'inline-block';
+					console.log("Menu On");
+					menuState = 1;
+				}else{
+					console.log("Menu Already On");
+				}
+			}
+			
+			function clickListener() {
+				document.addEventListener( "click", function(e) {
+				  var clickeElIsLink = clickInsideElement( e, contextMenuLinkClassName);
+
+				  if ( clickeElIsLink ) {
+					e.preventDefault();
+					console.log("Clicked Inside");
+				  } else {
+					var button = e.which || e.button;
+					if ( button === 1 ) {
+					  toggleMenuOff();
+					}
+				  }
+				});
+			  }
+
+			  /**
+			   * Listens for keyup events.
+			   */
+			function keyupListener() {
+				window.onkeyup = function(e) {
+					if ( e.keyCode === 27 ) {
+						toggleMenuOff();
+					}
+				}
+			}
+			
+			function getMessagesUnread(_callback){
+				var x = new XMLHttpRequest();
+				x.open("GET", "http://discoverable/getNumberOfUnreadMail.php", true);
+				x.onreadystatechange = function () {
+					if (x.readyState == 4 && x.status == 200){
+						//var doc = x.responseXML;
+						//console.log(doc);
+						var amountOfMessgaes = x.responseXML.getElementsByTagName('amount')[0].firstChild.nodeValue;
+						console.log(amountOfMessgaes);
+						window.messages = amountOfMessgaes;
+						_callback();
+					}
+				};
+				x.send(null);
+			}
+			
+			function getCookie(cname) {
+				var name = cname + "=";
+				var ca = document.cookie.split(';');
+				for(var i = 0; i <ca.length; i++) {
+					var c = ca[i];
+					while (c.charAt(0)==' ') {
+						c = c.substring(1);
+					}
+					if (c.indexOf(name) == 0) {
+						return c.substring(name.length,c.length);
+					}
+				}
+				return "";
+			}
+			
+			function checkCookie() {
+				var name=getCookie("NAME");
+				if(name==""){
+					document.getElementById("loggedin").style.display = "none";
+				}else{
+					
+					getMessagesUnread(function(){
+						document.getElementById("login").style.display = "none";
+						
+						
+						document.getElementById("user_name").innerHTML = decodeURIComponent(decodeURIComponent(name)) + " (" + window.messages + ")";
+						//getMessagesUnread();
+						document.getElementById("messages").innerHTML = "Messages (" + window.messages + ")";
+						//getMessagesUnread();
+					});
+				}
+				
+				document.getElementById("profile").href = "profile.php?u=" + getCookie("ID");
+			}
+			
+			function init(){
+				checkCookie();
+				clickListener();
+				keyupListener();
+			}
+			
+		</script>
+		
+		<div class="mainContent">
+			<div class="news">
+				<article class="topContent">
+					<header>
+						<h2><a href="#" title="What Is The RPIDAY Project">What Is The RPIDAY Project</a></h2>
+					</header>
+					
+					<content>
+						<p>The project was started by Joseph Saunders in 2016 in the UK.<br>The project turns a linux machine (such as a <a href="https://www.raspberrypi.org/">Raspberry Pi</a>) into a 
+						fully function clock and bedside utility tool.</p>
+					</content>
+				</article>
+				
+				<article class="middleContent">
+					<header>
+						<h2><a href="#" title="The Software">The Software</a></h2>
+					</header>
+					
+					<content>
+						<p>All the application software is wrote in Python and is fully open source and modable. Plugin pages can be found over the internet, so every week we chose our favourite one and will
+						post a link to it on the home page.</p>
+					</content>
+				</article>
+				
+				<article class="bottomContent">
+					<header>
+						<h2><a href="#" title="Other">Other</a></h2>
+					</header>
+					
+					<content>
+						<p>Will Be Filled In At A Later Date.</p>
+					</content>
+				</article>
+			</div>
+		</div>
+
+		
+		<footer class="mainFooter">
+			<p>Copyright &copy; 2015 <a href="#" title="Joseph-Saunders">Joseph Saunders</a>
+				<ul class="HeadList">
+					<li class="HeadElement"><h4>Pages</h4>
+						<ul class="subList">
+							<li class="active"><a href="index.html">Home</a></li>
+							<li><a href="projects.html">Projects</a></li>
+							<li><a href="yourRPIDAY.php">Your RPIDAY</a></li>
+							<li><a href="help.html">Help</a></li>
+							<li><a href="login.html">Log In</a></li>
+							<li><a href="signup.html">Sign Up</a></li>
+							<li><a href="contact.html">Contact</a></li>
+						</ul>
+					</li>
+					
+					<li class="HeadElement"><h4>Info and T&C's</h4>
+						<ul class="subList">
+							<li><a href="#">EULA</a></li>
+							<li><a href="#">T&C's</a></li>
+							<li><a href="#">Info On Unknown&trade;</a></li>
+							<li><a href="#">Copyright</a></li>
+							<li><a href="#">Freedom Of Information</a></li>
+						</ul>
+					</li>
+					
+					<li class="HeadElement"><h4>Contact</h4>
+						<ul class="subList">
+							<li><a href="#">Website: www.rpiday.com</a></li>
+							<li><a href="#">Email: contact@rpiday.com</a></li>
+							<li><a href="#">Reddit: r/RPIDAY</a></li>
+							<li><a href="#">Phone: No Phone</a></li>
+						</ul>
+					</li>
+				</ul>
+			</p>
+		</footer>
+		
+	</body>
+</html>
